@@ -1,11 +1,77 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
-    <title>Spring Security Example</title>
+    <meta charset="UTF-8">
+    <title>Users</title>
+
 </head>
 <body>
-<h1>Welcome to Index PAGE!</h1>
 
+<h2>Users: (count =
+    <th:block th:text="${users.size()}"/>
+    )
+</h2>
+
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Login</th>
+        <th>Password</th>
+        <th>First Name</th>
+        <th>Second Name</th>
+        <th>Email</th>
+        <th>Edit</th>
+        <th>Delete</th>
+    </tr>
+    </thead>
+    <tbody>
+    <th:block th:each="user : ${users}">
+        <tr>
+            <th>
+                <a th:href="@{/user/{id}(id=${user.id})}" th:text="${user.id}"/>
+            </th>
+            <th>
+                <th:block th:text="${user.login}"/>
+            </th>
+            <th>
+                <th:block th:text="${user.password}"/>
+            </th>
+            <th>
+                <th:block th:text="${user.firstName}"/>
+            </th>
+            <th>
+                <th:block th:text="${user.secondName}"/>
+            </th>
+            <th>
+                <th:block th:text="${user.email}"/>
+            </th>
+            <th>
+                <form th:action="@{/admin/edit/{id}(id=${user.id})}">
+                    <button>Edit</button>
+                </form>
+            </th>
+            <th>
+                <form th:action="@{/admin/delete/{id}(id=${user.id})}">
+                    <button>Delete</button>
+                </form>
+            </th>
+        </tr>
+    </th:block>
+    </tbody>
+</table>
+
+<br/>
+
+<hr/>
+
+<form th:action="@{/admin/new}">
+    <button>Add new user</button>
+</form>
+
+<form th:action="@{/logout}">
+    <button th:style="'color: red'">Logout</button>
+</form>
 
 </body>
 </html>
