@@ -1,6 +1,5 @@
 package ru.kata.spring.boot_security.demo.dao;
 
-
 import org.springframework.stereotype.Repository;
 import ru.kata.spring.boot_security.demo.model.User;
 
@@ -27,11 +26,6 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public User getUser(Long id) {
-        return entityManager.find(User.class, id);
-    }
-
-    @Override
     public void deleteUser(Long id) {
         entityManager.remove(entityManager.find(User.class, id));
     }
@@ -42,9 +36,14 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public User findUserByLogin(String login) {
-        return entityManager.createQuery("FROM User u WHERE u.login = :login", User.class)
-                .setParameter("login", login)
+    public User findUserByEmail(String email) {
+        return entityManager.createQuery("FROM User u WHERE u.email = :email", User.class)
+                .setParameter("email", email)
                 .getSingleResult();
+    }
+
+    @Override
+    public User findUserById(Long id) {
+        return id != null ? entityManager.find(User.class, id) : new User();
     }
 }

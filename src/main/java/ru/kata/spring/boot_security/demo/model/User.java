@@ -7,8 +7,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Set;
+import java.util.List;
 
 @NoArgsConstructor
 @Getter
@@ -21,32 +22,35 @@ public class User implements UserDetails {
     @Column(name = "id")
     private Long id;
 
-    private String login;
+    @Column(name = "email")
+    private String email;
 
+    @Column(name = "password")
     private String password;
 
     @Column(name = "first_name")
     private String firstName;
 
-    @Column(name = "second_name")
-    private String secondName;
+    @Column(name = "last_name")
+    private String lastName;
 
-    private String email;
+    @Column(name = "age")
+    private int age;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
     @JoinTable(
             name = "user_role"
             , joinColumns = @JoinColumn(name = "user_id")
             , inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    private Set<Role> roles;
+    private List<Role> roles = new ArrayList<>();
 
-    public User(String login, String password, String firstName, String secondName, String email, Set<Role> roles) {
-        this.login = login;
+    public User(String email, String password, String firstName, String lastName, int age, List<Role> roles) {
+        this.email = email;
         this.password = password;
         this.firstName = firstName;
-        this.secondName = secondName;
-        this.email = email;
+        this.lastName = lastName;
+        this.age = age;
         this.roles = roles;
     }
 
@@ -54,11 +58,11 @@ public class User implements UserDetails {
     public String toString() {
         return "User{" +
                 "id=" + id +
-                ", login='" + login + '\'' +
+                ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", firstName='" + firstName + '\'' +
-                ", secondName='" + secondName + '\'' +
-                ", email='" + email + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", age=" + age +
                 '}';
     }
 
@@ -69,7 +73,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return login;
+        return email;
     }
 
     @Override

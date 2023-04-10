@@ -5,7 +5,6 @@ import ru.kata.spring.boot_security.demo.model.User;
 import java.util.List;
 
 public interface UserDao {
-    User getUser(Long id);
 
     List<User> getAllUsers();
 
@@ -15,5 +14,7 @@ public interface UserDao {
 
     void updateUser(User user);
 
-    User findUserByLogin(String login);
+    User findUserByEmail(String email);
+
+    User findUserById(Long id);
 }

@@ -1,50 +1,35 @@
 package ru.kata.spring.boot_security.demo.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.kata.spring.boot_security.demo.dao.UserDao;
+import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
 
     private final UserDao userDao;
+    private final RoleService roleService;
 
-    private final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
-
-
-    public UserServiceImpl(UserDao userDao) {
+    public UserServiceImpl(UserDao userDao, RoleService roleService) {
         this.userDao = userDao;
+        this.roleService = roleService;
     }
 
     @Override
-    public User getUser(Long id) {
-        return userDao.getUser(id);
-    }
-
-    @Override
-    @Transactional
-    public User findUserByLogin(String login) {
-        return userDao.findUserByLogin(login);
+    public User findUserByEmail(String email) {
+        return userDao.findUserByEmail(email);
     }
 
     @Override
     public List<User> getAllUsers() {
         return userDao.getAllUsers();
-    }
-
-    @Override
-    @Transactional
-    public void saveUser(User user) {
-        user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
-        userDao.saveUser(user);
     }
 
     @Override
@@ -55,14 +40,37 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void updateUser(User user) {
-        userDao.updateUser(user);
+    public void saveOrUpdate(User user) {
+        List<String> allRolesFromDataBaseString = roleService.getRoles()
+                .stream()
+                .map(Role::getRole)
+                .toList();
+        List<Role> newRoles = new ArrayList<>();
+        for (Role role : user.getRoles()) {
+            if (allRolesFromDataBaseString.contains(role.getRole())) {
+                newRoles.add(roleService.findRoleByName(role.getRole()));
+            }
+        }
+        user.setRoles(newRoles);
+
+        String currentPassword = user.getPassword();
+        String passwordFromDataBase = userDao.findUserById(user.getId()).getPassword();
+
+        if (user.getId() == null) {
+            user.setPassword(new BCryptPasswordEncoder().encode(currentPassword));
+            userDao.saveUser(user);
+        } else {
+            if (!currentPassword.equals(passwordFromDataBase)) {
+                user.setPassword(new BCryptPasswordEncoder().encode(currentPassword));
+            }
+            userDao.updateUser(user);
+        }
     }
 
     @Override
     @Transactional
-    public UserDetails loadUserByUsername(String username) {
-        User userByLogin = userDao.findUserByLogin(username);
-        return new org.springframework.security.core.userdetails.User(userByLogin.getUsername(), userByLogin.getPassword(), userByLogin.getAuthorities());
+    public UserDetails loadUserByUsername(String email) {
+        User userByLogin = userDao.findUserByEmail(email);
+        return new org.springframework.security.core.userdetails.User(userByLogin.getEmail(), userByLogin.getPassword(), userByLogin.getAuthorities());
     }
 }
