@@ -1,5 +1,6 @@
 package ru.kata.spring.boot_security.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,7 +18,6 @@ public class Role implements GrantedAuthority {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
-
     @Column(name = "role")
     private String role;
 
@@ -25,6 +25,7 @@ public class Role implements GrantedAuthority {
         this.role = role;
     }
 
+    @JsonIgnore
     @Override
     public String getAuthority() {
         return role;

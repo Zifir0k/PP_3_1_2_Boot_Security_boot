@@ -68,6 +68,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User findUserById(Long id) {
+        return userDao.findUserById(id);
+    }
+
+    @Override
     @Transactional
     public UserDetails loadUserByUsername(String email) {
         User userByLogin = userDao.findUserByEmail(email);

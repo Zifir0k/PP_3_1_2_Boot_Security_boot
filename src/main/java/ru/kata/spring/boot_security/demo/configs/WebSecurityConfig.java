@@ -27,18 +27,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .authorizeRequests()
-                .antMatchers("/user/**").hasAnyAuthority("USER", "ADMIN")
-                .antMatchers("/admin/**").hasAuthority("ADMIN")
-                .anyRequest()
-                .authenticated()
+                .csrf().disable()
+                    .authorizeRequests()
+                        .antMatchers("/user/**").hasAnyAuthority("USER", "ADMIN")
+                        .antMatchers("/admin/**").hasAuthority("ADMIN")
+                    .anyRequest()
+                    .authenticated()
                 .and()
-                .formLogin().usernameParameter("email")
-                .successHandler(successUserHandler).permitAll()
+                    .formLogin()
+                    .usernameParameter("email")
+                    .successHandler(successUserHandler)
+                    .permitAll()
                 .and()
-                .logout().logoutSuccessUrl("/login").invalidateHttpSession(true)
-                .clearAuthentication(true)
-                .deleteCookies("JSESSIONID")
+                    .logout().logoutSuccessUrl("/login").invalidateHttpSession(true)
+                    .clearAuthentication(true)
+                    .deleteCookies("JSESSIONID")
         ;
     }
 
@@ -49,7 +52,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public DaoAuthenticationProvider daoAuthenticationProvider() {
-
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
         authenticationProvider.setPasswordEncoder(passwordEncoder());
         authenticationProvider.setUserDetailsService(userService);
